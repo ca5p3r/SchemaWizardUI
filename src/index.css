@@ -27,6 +27,7 @@ html, body, #app, #root {
   align-items: end;
   padding-right: 11px;
   padding-top: 8px;
+  color: white;
 }
 
 .toast-message {
@@ -46,4 +47,10 @@ html, body, #app, #root {
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 2;
+}
+
+.tab-content {
+  height: 560px;
+  background-color: white;
+  color: #2f3238;
 }

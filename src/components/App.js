@@ -2,6 +2,7 @@ import NavigationBar from "./NavigationBar";
 import ConnectionForm from "./ConnectionForm";
 import MyToast from "./MyToast";
 import Loading from "./Loading";
+import ComparisonArea from "./ComparisonArea";
 import { useSelector } from "react-redux";
 
 export default function App() {
@@ -11,6 +12,7 @@ export default function App() {
       {isLoading && <Loading />}
       <NavigationBar />
       <ConnectionForm />
+      <ComparisonArea />
       <MyToast />
     </div>
   );
