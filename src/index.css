@@ -1,0 +1,49 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #2f3238;
+  color: white;
+  font-family: "Urbanist", sans-serif !important;
+}
+
+html, body, #app, #root {
+  width: 100%;
+  height: 100%;
+}
+
+.wizard-form {
+  margin-top: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-left: 1em;
+  width: 300px;
+}
+
+.navbar-collapse {
+  z-index: 1;
+}
+
+.nav-link {
+  align-items: end;
+  padding-right: 11px;
+  padding-top: 8px;
+}
+
+.toast-message {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 2;
+}
+
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
