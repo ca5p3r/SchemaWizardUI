@@ -50,7 +50,7 @@ html, body, #app, #root {
 }
 
 .tab-content {
-  height: 560px;
+  height: auto;
   background-color: white;
   color: #2f3238;
 }

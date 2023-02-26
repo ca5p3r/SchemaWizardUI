@@ -11,6 +11,7 @@ export const requester = async (
 ) => {
   const data = new FormData();
   if (enable_compare) {
+    data.append("generate_scripts", connection_object.generate_scripts);
     data.append("src_host", connection_object.src.host);
     data.append("src_port", connection_object.src.port);
     data.append("src_user", connection_object.src.username);

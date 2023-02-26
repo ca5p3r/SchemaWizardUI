@@ -40,6 +40,7 @@ export default function ConnectionForm() {
   const [srcTables, setSrcTables] = useState([]);
   const [destTables, setDestTables] = useState([]);
   const [detailedCompare, setDetailedCompare] = useState(false);
+  const [enableSQL, setEnableSQL] = useState(false);
   const dispatch = useDispatch();
   const enableSSH = useSelector((state) => state.app.enableSSH);
   const enableKeyAuth = useSelector((state) => state.app.enableKeyAuth);
@@ -61,6 +62,10 @@ export default function ConnectionForm() {
 
   const handleTableToggle = () => {
     dispatch(triggerTableCompare(!enableTableCompare));
+  };
+
+  const handleSQLToggle = () => {
+    setEnableSQL(!enableSQL);
   };
 
   const handleServerHostChange = (e) => {
@@ -375,8 +380,19 @@ export default function ConnectionForm() {
       (server) => server.serverID === destServer
     )[0];
     let comparison_connection = {
-      src: { ...srcObj, schema: srcSchema, table: srcTable },
-      dest: { ...destObj, schema: destSchema, table: destTable },
+      src: {
+        ...srcObj,
+        dbname: srcDatabase,
+        schema: srcSchema,
+        table: srcTable,
+      },
+      dest: {
+        ...destObj,
+        dbname: destDatabase,
+        schema: destSchema,
+        table: destTable,
+      },
+      generate_scripts: enableSQL,
     };
     try {
       const response = await requester(comparison_connection, url, true);
@@ -687,6 +703,14 @@ export default function ConnectionForm() {
             label="Enable table comparison?"
             onChange={handleTableToggle}
             checked={enableTableCompare}
+          />
+        </Form.Group>
+        <Form.Group className="wizard-form" controlId="enableScripts">
+          <Form.Check
+            type="checkbox"
+            label="Enable SQL generation?"
+            onChange={handleSQLToggle}
+            checked={enableSQL}
           />
         </Form.Group>
         <Button
