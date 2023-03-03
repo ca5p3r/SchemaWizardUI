@@ -65,3 +65,9 @@ export const updateDetailedSchema = (x = {}) => {
     payload: x,
   };
 };
+export const setActiveTab = (x = "0") => {
+  return {
+    type: "setActiveTab",
+    payload: x,
+  };
+};

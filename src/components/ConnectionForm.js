@@ -2,7 +2,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { triggerKeyAuth, triggerSSHTunnel, triggerTableCompare, triggerToast, addServer, triggerIsLoading, updateDetailedSchema, updateDetailedTable, updateQuickSchema, updateQuickTable } from "../actions";
+import { triggerKeyAuth, triggerSSHTunnel, triggerTableCompare, triggerToast, addServer, triggerIsLoading, updateDetailedSchema, updateDetailedTable, updateQuickSchema, updateQuickTable, setActiveTab } from "../actions";
 import { constants, requester } from "../utils";
 
 export default function ConnectionForm() {
@@ -35,6 +35,7 @@ export default function ConnectionForm() {
   const enableKeyAuth = useSelector((state) => state.app.enableKeyAuth);
   const serversList = useSelector((state) => state.server.serverList);
   const enableTableCompare = useSelector((state) => state.app.enableTableCompare);
+  let activeTab = useSelector((state) => state.app.activeResultTab);
 
   const handleSSHToggle = () => {
     setServerReady();
@@ -337,15 +338,24 @@ export default function ConnectionForm() {
 
   const handleCompare = async () => {
     dispatch(triggerIsLoading(true));
+    let possibleTabs = [];
+    let exclude = [];
     let url = "";
     let compare_mode = "quick";
     let compare_item = "schemas";
     if (detailedCompare) {
       compare_mode = "detailed";
+      possibleTabs = [1, 3];
+    } else {
+      possibleTabs = [0, 2];
     }
     if (enableTableCompare) {
       compare_item = "tables";
+      exclude = [0, 1];
+    } else {
+      exclude = [2, 3];
     }
+    activeTab = possibleTabs.filter((x) => exclude.includes(x));
     url = `${backend_service}/compare/${compare_mode}/${compare_item}`;
     let srcObj = serversList.filter((server) => server.serverID === srcServer)[0];
     let destObj = serversList.filter((server) => server.serverID === destServer)[0];
@@ -397,6 +407,7 @@ export default function ConnectionForm() {
       );
       dispatch(triggerIsLoading());
     }
+    dispatch(setActiveTab(activeTab.toString()));
   };
 
   return (

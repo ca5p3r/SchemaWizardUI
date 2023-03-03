@@ -3,6 +3,7 @@ const myState = {
   enableKeyAuth: false,
   enableTableCompare: false,
   isLoading: false,
+  activeResultTab: "0",
 };
 
 export const appReducer = (state = myState, action = {}) => {
@@ -26,6 +27,11 @@ export const appReducer = (state = myState, action = {}) => {
       return {
         ...state,
         isLoading: action.payload,
+      };
+    case "setActiveTab":
+      return {
+        ...state,
+        activeResultTab: action.payload,
       };
     default:
       return state;

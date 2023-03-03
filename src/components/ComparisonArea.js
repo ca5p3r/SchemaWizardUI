@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Table from "react-bootstrap/Table";
 import Accordion from "react-bootstrap/Accordion";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setActiveTab } from "../actions";
 
 function detailedTableView(table) {
   return (
@@ -323,15 +324,16 @@ function detailedTableView(table) {
 }
 
 export default function ComparisonArea() {
-  const [key, setKey] = useState("tableQuick");
   const quickTable = useSelector((state) => state.results.quickTableResults);
   const quickSchema = useSelector((state) => state.results.quickSchemaResults);
   const detailedTable = useSelector((state) => state.results.detailedTableResults);
   const detailedSchema = useSelector((state) => state.results.detailedSchemaResults);
+  const activeTab = useSelector((state) => state.app.activeResultTab);
+  const dispatch = useDispatch();
   const tableView = detailedTableView(detailedTable);
   return (
-    <Tabs id="comparisonTabs" activeKey={key} onSelect={(k) => setKey(k)} justify className="mt-3">
-      <Tab eventKey="tableQuick" title="Table Quick">
+    <Tabs id="comparisonTabs" activeKey={activeTab} onSelect={(k) => dispatch(setActiveTab(k))} justify className="mt-3">
+      <Tab eventKey={0} title="Table Quick">
         <Accordion>
           <Accordion.Item eventKey="1">
             <Accordion.Header>Columns to be altered - Modifications count: {quickTable.Columns ? quickTable.Columns["columns-to-be-altered"].length : 0}</Accordion.Header>
@@ -425,10 +427,10 @@ export default function ComparisonArea() {
           </Accordion.Item>
         </Accordion>
       </Tab>
-      <Tab eventKey="tableDetailed" title="Table Detailed">
+      <Tab eventKey={1} title="Table Detailed">
         {tableView}
       </Tab>
-      <Tab eventKey="schemaQuick" title="Schema Quick">
+      <Tab eventKey={2} title="Schema Quick">
         <Accordion>
           <Accordion.Item eventKey="0">
             <Accordion.Header>Tables to be created - Modifications count: {quickSchema["tables-to-be-created"] ? quickSchema["tables-to-be-created"].length : 0}</Accordion.Header>
@@ -476,7 +478,7 @@ export default function ComparisonArea() {
           </Accordion.Item>
         </Accordion>
       </Tab>
-      <Tab eventKey="schemaDetailed" title="Schema Detailed">
+      <Tab eventKey={3} title="Schema Detailed">
         <Accordion>
           <Accordion.Item eventKey="0">
             <Accordion.Header>Tables to be created - Modifications count: {detailedSchema ? detailedSchema["tables-to-be-created"].length : 0}</Accordion.Header>
@@ -553,7 +555,7 @@ export default function ComparisonArea() {
           </Accordion.Item>
         </Accordion>
       </Tab>
-      <Tab eventKey="SQL" title="Generated SQLs"></Tab>
+      <Tab eventKey={4} title="Generated SQLs"></Tab>
     </Tabs>
   );
 }
