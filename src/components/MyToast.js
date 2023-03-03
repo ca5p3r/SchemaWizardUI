@@ -10,14 +10,7 @@ const MyToast = () => {
   const toastID = useSelector((state) => state.toast.toastID);
   return (
     <div className="toast-message">
-      <Toast
-        key={toastID}
-        className={`bg-${color}`}
-        onClose={() => dispatch(triggerToast())}
-        show={visibility}
-        delay={3000}
-        autohide
-      >
+      <Toast key={toastID} className={`bg-${color}`} onClose={() => dispatch(triggerToast())} show={visibility} delay={3000} autohide>
         <Toast.Header>
           <strong className="me-auto">{title}</strong>
         </Toast.Header>

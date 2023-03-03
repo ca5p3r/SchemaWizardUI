@@ -1,13 +1,13 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Provider } from "react-redux";
-import ReactDOM from 'react-dom/client';
+import ReactDOM from "react-dom/client";
 import { store } from "./store";
 import React from "react";
 import App from "./components/App";
 import "./index.css";
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <Provider store={store}>

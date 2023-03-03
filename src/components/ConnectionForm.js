@@ -2,18 +2,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  triggerKeyAuth,
-  triggerSSHTunnel,
-  triggerTableCompare,
-  triggerToast,
-  addServer,
-  triggerIsLoading,
-  updateDetailedSchema,
-  updateDetailedTable,
-  updateQuickSchema,
-  updateQuickTable,
-} from "../actions";
+import { triggerKeyAuth, triggerSSHTunnel, triggerTableCompare, triggerToast, addServer, triggerIsLoading, updateDetailedSchema, updateDetailedTable, updateQuickSchema, updateQuickTable } from "../actions";
 import { constants, requester } from "../utils";
 
 export default function ConnectionForm() {
@@ -45,9 +34,7 @@ export default function ConnectionForm() {
   const enableSSH = useSelector((state) => state.app.enableSSH);
   const enableKeyAuth = useSelector((state) => state.app.enableKeyAuth);
   const serversList = useSelector((state) => state.server.serverList);
-  const enableTableCompare = useSelector(
-    (state) => state.app.enableTableCompare
-  );
+  const enableTableCompare = useSelector((state) => state.app.enableTableCompare);
 
   const handleSSHToggle = () => {
     setServerReady();
@@ -189,9 +176,7 @@ export default function ConnectionForm() {
       } else {
         setDestServer(option);
       }
-      const serverObj = serversList.filter(
-        (server) => server.serverID === option
-      )[0];
+      const serverObj = serversList.filter((server) => server.serverID === option)[0];
       const url = `${backend_service}/list/databases`;
       try {
         const response = await requester(serverObj, url);
@@ -236,14 +221,10 @@ export default function ConnectionForm() {
     if (option !== "selector") {
       dispatch(triggerIsLoading(true));
       if (targetID === "sourceDatabase") {
-        serverObj = serversList.filter(
-          (server) => server.serverID === srcServer
-        )[0];
+        serverObj = serversList.filter((server) => server.serverID === srcServer)[0];
         setSrcDatabase(option);
       } else {
-        serverObj = serversList.filter(
-          (server) => server.serverID === destServer
-        )[0];
+        serverObj = serversList.filter((server) => server.serverID === destServer)[0];
         setDestDatabase(option);
       }
       const url = `${backend_service}/list/schemas`;
@@ -291,24 +272,17 @@ export default function ConnectionForm() {
     if (option !== "selector") {
       dispatch(triggerIsLoading(true));
       if (targetID === "sourceSchema") {
-        serverObj = serversList.filter(
-          (server) => server.serverID === srcServer
-        )[0];
+        serverObj = serversList.filter((server) => server.serverID === srcServer)[0];
         currentDB = srcDatabase;
         setSrcSchema(option);
       } else {
-        serverObj = serversList.filter(
-          (server) => server.serverID === destServer
-        )[0];
+        serverObj = serversList.filter((server) => server.serverID === destServer)[0];
         currentDB = destDatabase;
         setDestSchema(option);
       }
       const url = `${backend_service}/list/tables`;
       try {
-        const response = await requester(
-          { ...serverObj, dbname: currentDB, schema: option },
-          url
-        );
+        const response = await requester({ ...serverObj, dbname: currentDB, schema: option }, url);
         if (targetID === "sourceSchema") {
           setSrcTables(response.data.result);
         } else {
@@ -373,12 +347,8 @@ export default function ConnectionForm() {
       compare_item = "tables";
     }
     url = `${backend_service}/compare/${compare_mode}/${compare_item}`;
-    let srcObj = serversList.filter(
-      (server) => server.serverID === srcServer
-    )[0];
-    let destObj = serversList.filter(
-      (server) => server.serverID === destServer
-    )[0];
+    let srcObj = serversList.filter((server) => server.serverID === srcServer)[0];
+    let destObj = serversList.filter((server) => server.serverID === destServer)[0];
     let comparison_connection = {
       src: {
         ...srcObj,
@@ -436,33 +406,15 @@ export default function ConnectionForm() {
           <Form.Label>Server options: </Form.Label>
         </Form.Group>
         <Form.Group className="wizard-form" controlId="enableSSHTunnel">
-          <Form.Check
-            type="checkbox"
-            label="Use SSH tunnel?"
-            checked={enableSSH}
-            onChange={handleSSHToggle}
-          />
+          <Form.Check type="checkbox" label="Use SSH tunnel?" checked={enableSSH} onChange={handleSSHToggle} />
         </Form.Group>
-        <Button
-          className="wizard-form"
-          variant="outline-warning"
-          onClick={handleServerCheck}
-        >
+        <Button className="wizard-form" variant="outline-warning" onClick={handleServerCheck}>
           Test connection
         </Button>
-        <Button
-          className="wizard-form"
-          variant="outline-success"
-          onClick={handleAddServer}
-          disabled={!serverReady}
-        >
+        <Button className="wizard-form" variant="outline-success" onClick={handleAddServer} disabled={!serverReady}>
           Add to servers list
         </Button>
-        <Button
-          className="wizard-form"
-          variant="outline-danger"
-          onClick={handleCleanFields}
-        >
+        <Button className="wizard-form" variant="outline-danger" onClick={handleCleanFields}>
           Reset
         </Button>
       </Form>
@@ -471,32 +423,16 @@ export default function ConnectionForm() {
           <Form.Label>Server details: </Form.Label>
         </Form.Group>
         <Form.Group className="wizard-form" controlId="serverHost">
-          <Form.Control
-            type="text"
-            placeholder="Server host"
-            onChange={handleServerHostChange}
-          />
+          <Form.Control type="text" placeholder="Server host" onChange={handleServerHostChange} />
         </Form.Group>
         <Form.Group className="wizard-form" controlId="serverPort">
-          <Form.Control
-            type="text"
-            placeholder="Server port"
-            onChange={handleServerPortChange}
-          />
+          <Form.Control type="text" placeholder="Server port" onChange={handleServerPortChange} />
         </Form.Group>
         <Form.Group className="wizard-form" controlId="serverUsername">
-          <Form.Control
-            type="text"
-            placeholder="Server username"
-            onChange={handleServerUserChange}
-          />
+          <Form.Control type="text" placeholder="Server username" onChange={handleServerUserChange} />
         </Form.Group>
         <Form.Group className="wizard-form" controlId="serverPassword">
-          <Form.Control
-            type="password"
-            placeholder="Server password"
-            onChange={handleServerPasswordChange}
-          />
+          <Form.Control type="password" placeholder="Server password" onChange={handleServerPasswordChange} />
         </Form.Group>
       </Form>
       {enableSSH && (
@@ -505,25 +441,13 @@ export default function ConnectionForm() {
             <Form.Label>SSH connection</Form.Label>
           </Form.Group>
           <Form.Group className="wizard-form" controlId="SSHHost">
-            <Form.Control
-              type="text"
-              placeholder="SSH host"
-              onChange={handleServerSSHHostChange}
-            />
+            <Form.Control type="text" placeholder="SSH host" onChange={handleServerSSHHostChange} />
           </Form.Group>
           <Form.Group className="wizard-form" controlId="SSHPort">
-            <Form.Control
-              type="text"
-              placeholder="SSH port"
-              onChange={handleServerSSHPortChange}
-            />
+            <Form.Control type="text" placeholder="SSH port" onChange={handleServerSSHPortChange} />
           </Form.Group>
           <Form.Group className="wizard-form" controlId="SSHUsername">
-            <Form.Control
-              type="text"
-              placeholder="SSH username"
-              onChange={handleServerSSHUserChange}
-            />
+            <Form.Control type="text" placeholder="SSH username" onChange={handleServerSSHUserChange} />
           </Form.Group>
         </Form>
       )}
@@ -532,14 +456,7 @@ export default function ConnectionForm() {
           <Form.Group className="wizard-form" controlId="SSHLabel">
             <Form.Label>SSH credentials</Form.Label>
           </Form.Group>
-          <Form.Check
-            className="wizard-form"
-            type="switch"
-            id="keyPasswordSwitch"
-            label="Enable to use key authentication"
-            onChange={handleKeyToggle}
-            checked={enableKeyAuth}
-          />
+          <Form.Check className="wizard-form" type="switch" id="keyPasswordSwitch" label="Enable to use key authentication" onChange={handleKeyToggle} checked={enableKeyAuth} />
           {enableKeyAuth && (
             <Form.Group controlId="SSHKeyFile" className="wizard-form">
               <Form.Control type="file" onChange={handleServerSSHKeyChange} />
@@ -547,11 +464,7 @@ export default function ConnectionForm() {
           )}
           {!enableKeyAuth && (
             <Form.Group className="wizard-form" controlId="SSHPassword">
-              <Form.Control
-                type="password"
-                placeholder="SSH password"
-                onChange={handleServerSSHPasswordChange}
-              />
+              <Form.Control type="password" placeholder="SSH password" onChange={handleServerSSHPasswordChange} />
             </Form.Group>
           )}
         </Form>
@@ -698,26 +611,12 @@ export default function ConnectionForm() {
           />
         </Form.Group>
         <Form.Group className="wizard-form" controlId="enableTable">
-          <Form.Check
-            type="checkbox"
-            label="Enable table comparison?"
-            onChange={handleTableToggle}
-            checked={enableTableCompare}
-          />
+          <Form.Check type="checkbox" label="Enable table comparison?" onChange={handleTableToggle} checked={enableTableCompare} />
         </Form.Group>
         <Form.Group className="wizard-form" controlId="enableScripts">
-          <Form.Check
-            type="checkbox"
-            label="Enable SQL generation?"
-            onChange={handleSQLToggle}
-            checked={enableSQL}
-          />
+          <Form.Check type="checkbox" label="Enable SQL generation?" onChange={handleSQLToggle} checked={enableSQL} />
         </Form.Group>
-        <Button
-          className="wizard-form"
-          variant="outline-info"
-          onClick={handleCompare}
-        >
+        <Button className="wizard-form" variant="outline-info" onClick={handleCompare}>
           Compare
         </Button>
       </Form>
