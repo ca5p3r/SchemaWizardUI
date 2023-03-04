@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { triggerKeyAuth, triggerSSHTunnel, triggerTableCompare, triggerToast, addServer, triggerIsLoading, updateDetailedSchema, updateDetailedTable, updateQuickSchema, updateQuickTable, setActiveTab } from "../actions";
 import { constants, requester } from "../utils";
+import { Select } from "antd";
 
 export default function ConnectionForm() {
   const backend_service = constants.backend_service;
+  const { Option } = Select;
   const [serverObject, setServerObject] = useState({
     host: "",
     port: "",
@@ -165,174 +167,126 @@ export default function ConnectionForm() {
     handleCleanFields();
   };
 
-  const handleServerChanged = async (e) => {
-    const targetID = e.target.id;
-    const index = e.target.selectedIndex;
-    const element = e.target.childNodes[index];
-    const option = element.getAttribute("id");
-    if (option !== "selector") {
-      dispatch(triggerIsLoading(true));
-      if (targetID === "sourceServer") {
-        setSrcServer(option);
-      } else {
-        setDestServer(option);
-      }
-      const serverObj = serversList.filter((server) => server.serverID === option)[0];
-      const url = `${backend_service}/list/databases`;
-      try {
-        const response = await requester(serverObj, url);
-        if (targetID === "sourceServer") {
-          setSrcDatabases(response.data.result);
-        } else {
-          setDestDatabases(response.data.result);
-        }
-        dispatch(
-          triggerToast({
-            title: "Success",
-            message: response.data.message,
-            visible: true,
-          })
-        );
-        dispatch(triggerIsLoading());
-      } catch (error) {
-        dispatch(
-          triggerToast({
-            title: "Danger",
-            message: error.response.data.message,
-            visible: true,
-          })
-        );
-        dispatch(triggerIsLoading());
-      }
+  const handleServerChanged = async (_, option) => {
+    dispatch(triggerIsLoading(true));
+    if (option.type === "sourceServer") {
+      setSrcServer(option.id);
     } else {
-      if (targetID === "sourceServer") {
-        setSrcDatabases([]);
+      setDestServer(option.id);
+    }
+    const serverObj = serversList.filter((server) => server.serverID === option.id)[0];
+    const url = `${backend_service}/list/databases`;
+    try {
+      const response = await requester(serverObj, url);
+      if (option.type === "sourceServer") {
+        setSrcDatabases(response.data.result);
       } else {
-        setDestDatabases([]);
+        setDestDatabases(response.data.result);
       }
+      dispatch(
+        triggerToast({
+          title: "Success",
+          message: response.data.message,
+          visible: true,
+        })
+      );
+      dispatch(triggerIsLoading());
+    } catch (error) {
+      dispatch(
+        triggerToast({
+          title: "Danger",
+          message: error.response.data.message,
+          visible: true,
+        })
+      );
+      dispatch(triggerIsLoading());
     }
   };
 
-  const handleDBChanged = async (e) => {
-    const targetID = e.target.id;
-    const index = e.target.selectedIndex;
-    const element = e.target.childNodes[index];
-    const option = element.getAttribute("id");
-    let serverObj = {};
-    if (option !== "selector") {
-      dispatch(triggerIsLoading(true));
-      if (targetID === "sourceDatabase") {
-        serverObj = serversList.filter((server) => server.serverID === srcServer)[0];
-        setSrcDatabase(option);
-      } else {
-        serverObj = serversList.filter((server) => server.serverID === destServer)[0];
-        setDestDatabase(option);
-      }
-      const url = `${backend_service}/list/schemas`;
-      try {
-        const response = await requester({ ...serverObj, dbname: option }, url);
-        if (targetID === "sourceDatabase") {
-          setSrcSchemas(response.data.result);
-        } else {
-          setDestSchemas(response.data.result);
-        }
-        dispatch(
-          triggerToast({
-            title: "Success",
-            message: response.data.message,
-            visible: true,
-          })
-        );
-        dispatch(triggerIsLoading());
-      } catch (error) {
-        dispatch(
-          triggerToast({
-            title: "Danger",
-            message: error.response.data.message,
-            visible: true,
-          })
-        );
-        dispatch(triggerIsLoading());
-      }
+  const handleDBChanged = async (_, option) => {
+    dispatch(triggerIsLoading(true));
+    let serverObj;
+    if (option.type === "sourceDatabase") {
+      serverObj = serversList.filter((server) => server.serverID === srcServer)[0];
+      setSrcDatabase(option.value);
     } else {
-      if (targetID === "sourceDatabase") {
-        setSrcSchemas([]);
+      serverObj = serversList.filter((server) => server.serverID === destServer)[0];
+      setDestDatabase(option.value);
+    }
+    const url = `${backend_service}/list/schemas`;
+    try {
+      const response = await requester({ ...serverObj, dbname: option.value }, url);
+      if (option.type === "sourceDatabase") {
+        setSrcSchemas(response.data.result);
       } else {
-        setDestSchemas([]);
+        setDestSchemas(response.data.result);
       }
+      dispatch(
+        triggerToast({
+          title: "Success",
+          message: response.data.message,
+          visible: true,
+        })
+      );
+      dispatch(triggerIsLoading());
+    } catch (error) {
+      dispatch(
+        triggerToast({
+          title: "Danger",
+          message: error.response.data.message,
+          visible: true,
+        })
+      );
+      dispatch(triggerIsLoading());
     }
   };
 
-  const handleSchemaChanged = async (e) => {
-    const targetID = e.target.id;
-    const index = e.target.selectedIndex;
-    const element = e.target.childNodes[index];
-    const option = element.getAttribute("id");
+  const handleSchemaChanged = async (_, option) => {
     let serverObj = {};
     let currentDB = "";
-    if (option !== "selector") {
-      dispatch(triggerIsLoading(true));
-      if (targetID === "sourceSchema") {
-        serverObj = serversList.filter((server) => server.serverID === srcServer)[0];
-        currentDB = srcDatabase;
-        setSrcSchema(option);
-      } else {
-        serverObj = serversList.filter((server) => server.serverID === destServer)[0];
-        currentDB = destDatabase;
-        setDestSchema(option);
-      }
-      const url = `${backend_service}/list/tables`;
-      try {
-        const response = await requester({ ...serverObj, dbname: currentDB, schema: option }, url);
-        if (targetID === "sourceSchema") {
-          setSrcTables(response.data.result);
-        } else {
-          setDestTables(response.data.result);
-        }
-        dispatch(
-          triggerToast({
-            title: "Success",
-            message: response.data.message,
-            visible: true,
-          })
-        );
-        dispatch(triggerIsLoading());
-      } catch (error) {
-        dispatch(
-          triggerToast({
-            title: "Danger",
-            message: error.response.data.message,
-            visible: true,
-          })
-        );
-        dispatch(triggerIsLoading());
-      }
+    dispatch(triggerIsLoading(true));
+    if (option.type === "sourceSchema") {
+      serverObj = serversList.filter((server) => server.serverID === srcServer)[0];
+      currentDB = srcDatabase;
+      setSrcSchema(option.value);
     } else {
-      if (targetID === "sourceSchema") {
-        setSrcTables([]);
+      serverObj = serversList.filter((server) => server.serverID === destServer)[0];
+      currentDB = destDatabase;
+      setDestSchema(option.value);
+    }
+    const url = `${backend_service}/list/tables`;
+    try {
+      const response = await requester({ ...serverObj, dbname: currentDB, schema: option.value }, url);
+      if (option.type === "sourceSchema") {
+        setSrcTables(response.data.result);
       } else {
-        setDestTables([]);
+        setDestTables(response.data.result);
       }
+      dispatch(
+        triggerToast({
+          title: "Success",
+          message: response.data.message,
+          visible: true,
+        })
+      );
+      dispatch(triggerIsLoading());
+    } catch (error) {
+      dispatch(
+        triggerToast({
+          title: "Danger",
+          message: error.response.data.message,
+          visible: true,
+        })
+      );
+      dispatch(triggerIsLoading());
     }
   };
 
-  const handleTableChanged = (e) => {
-    const targetID = e.target.id;
-    const index = e.target.selectedIndex;
-    const element = e.target.childNodes[index];
-    const option = element.getAttribute("id");
-    if (option !== "selector") {
-      if (targetID === "sourceTable") {
-        setSrcTable(option);
-      } else {
-        setDestTable(option);
-      }
+  const handleTableChanged = (_, option) => {
+    if (option.type === "sourceTable") {
+      setSrcTable(option.value);
     } else {
-      if (targetID === "sourceTable") {
-        setSrcTable("");
-      } else {
-        setDestTable("");
-      }
+      setDestTable(option.value);
     }
   };
 
@@ -381,20 +335,20 @@ export default function ConnectionForm() {
       if (detailedCompare) {
         if (enableTableCompare) {
           dispatch(updateDetailedTable(response.data.result));
-          sqlArea.value = response.data.result.Columns.scripts.replaceAll(";", ";\n");
+          sqlArea.value = response.data.result.Columns.scripts ? response.data.result.Columns.scripts.replaceAll(";", ";\n") : "";
         } else {
           dispatch(updateDetailedSchema(response.data.result));
           for (let table in response.data.result["tables-to-be-altered"]) {
             let tableKey = Object.keys(response.data.result["tables-to-be-altered"][table]);
             let tableScripts = response.data.result["tables-to-be-altered"][table][tableKey].Columns.scripts;
-            sqlString.push(tableScripts);
+            sqlString.push(tableScripts ? tableScripts : "");
           }
           sqlArea.value = sqlString.join("").replaceAll(";", ";\n");
         }
       } else {
         if (enableTableCompare) {
           dispatch(updateQuickTable(response.data.result));
-          sqlArea.value = response.data.result.Columns.scripts.replaceAll(";", ";\n");
+          sqlArea.value = response.data.result.Columns.scripts ? response.data.result.Columns.scripts.replaceAll(";", ";\n") : "";
         } else {
           dispatch(updateQuickSchema(response.data.result));
           sqlArea.value = "";
@@ -495,63 +449,50 @@ export default function ConnectionForm() {
         <Form.Group className="wizard-form" controlId="sourceLabel">
           <Form.Label>Select source: </Form.Label>
         </Form.Group>
-        <Form.Group className="wizard-form" controlId="sourceServer">
-          <Form.Control as="select" onChange={handleServerChanged}>
-            <option id="selector" value="Selector">
-              Select source server
-            </option>
+        <Form.Group className="wizard-form">
+          <Select showSearch placeholder="Select source server" onChange={handleServerChanged} style={{ width: 300 }}>
             {serversList.map((server, key) => {
               return (
-                <option id={server.serverID} key={key}>
+                <Option value={`${server.username}@${server.host}:${server.port}`} type={"sourceServer"} id={server.serverID} key={key}>
                   {`${server.username}@${server.host}:${server.port}`}
-                </option>
+                </Option>
               );
             })}
-          </Form.Control>
+          </Select>
         </Form.Group>
-        <Form.Group className="wizard-form" controlId="sourceDatabase">
-          <Form.Control as="select" onChange={handleDBChanged}>
-            <option id="selector" value="Selector">
-              Select database
-            </option>
+        <Form.Group className="wizard-form">
+          <Select showSearch placeholder="Select source database" onChange={handleDBChanged} style={{ width: 300 }}>
             {srcDatabases.map((database, key) => {
               return (
-                <option id={database} key={key}>
+                <Option value={database} type="sourceDatabase" key={key}>
                   {database}
-                </option>
+                </Option>
               );
             })}
-          </Form.Control>
+          </Select>
         </Form.Group>
-        <Form.Group className="wizard-form" controlId="sourceSchema">
-          <Form.Control as="select" onChange={handleSchemaChanged}>
-            <option id="selector" value="Selector">
-              Select Schema
-            </option>
+        <Form.Group className="wizard-form">
+          <Select showSearch placeholder="Select source schema" onChange={handleSchemaChanged} style={{ width: 300 }}>
             {srcSchemas.map((schema, key) => {
               return (
-                <option id={schema} key={key}>
+                <Option value={schema} type="sourceSchema" key={key}>
                   {schema}
-                </option>
+                </Option>
               );
             })}
-          </Form.Control>
+          </Select>
         </Form.Group>
-
         {enableTableCompare && (
-          <Form.Group className="wizard-form" controlId="sourceTable">
-            <Form.Control as="select" onChange={handleTableChanged}>
-              <option id="selector" value="Selector">
-                Select Table
-              </option>
+          <Form.Group className="wizard-form">
+            <Select showSearch placeholder="Select source table" onChange={handleTableChanged} style={{ width: 300 }}>
               {srcTables.map((table, key) => {
                 return (
-                  <option id={table} key={key}>
+                  <Option value={table} type="sourceTable" key={key}>
                     {table}
-                  </option>
+                  </Option>
                 );
               })}
-            </Form.Control>
+            </Select>
           </Form.Group>
         )}
       </Form>
@@ -559,62 +500,50 @@ export default function ConnectionForm() {
         <Form.Group className="wizard-form" controlId="destinationLabel">
           <Form.Label>Select destination: </Form.Label>
         </Form.Group>
-        <Form.Group className="wizard-form" controlId="destinationServer">
-          <Form.Control as="select" onChange={handleServerChanged}>
-            <option id="selector" value="Selector">
-              Select destination server
-            </option>
+        <Form.Group className="wizard-form">
+          <Select showSearch placeholder="Select target server" onChange={handleServerChanged} style={{ width: 300 }}>
             {serversList.map((server, key) => {
               return (
-                <option id={server.serverID} key={key}>
+                <Option value={`${server.username}@${server.host}:${server.port}`} type={"destinationServer"} id={server.serverID} key={key}>
                   {`${server.username}@${server.host}:${server.port}`}
-                </option>
+                </Option>
               );
             })}
-          </Form.Control>
+          </Select>
         </Form.Group>
-        <Form.Group className="wizard-form" controlId="destinationDatabase">
-          <Form.Control as="select" onChange={handleDBChanged}>
-            <option id="selector" value="Selector">
-              Select database
-            </option>
+        <Form.Group className="wizard-form">
+          <Select showSearch placeholder="Select target database" onChange={handleDBChanged} style={{ width: 300 }}>
             {destDatabases.map((database, key) => {
               return (
-                <option id={database} key={key}>
+                <Option value={database} type="destinationDatabase" key={key}>
                   {database}
-                </option>
+                </Option>
               );
             })}
-          </Form.Control>
+          </Select>
         </Form.Group>
-        <Form.Group className="wizard-form" controlId="destinationSchema">
-          <Form.Control as="select" onChange={handleSchemaChanged}>
-            <option id="selector" value="Selector">
-              Select Schema
-            </option>
+        <Form.Group className="wizard-form">
+          <Select showSearch placeholder="Select target schema" onChange={handleSchemaChanged} style={{ width: 300 }}>
             {destSchemas.map((schema, key) => {
               return (
-                <option id={schema} key={key}>
+                <Option value={schema} type="destinationSchema" key={key}>
                   {schema}
-                </option>
+                </Option>
               );
             })}
-          </Form.Control>
+          </Select>
         </Form.Group>
         {enableTableCompare && (
-          <Form.Group className="wizard-form" controlId="destinationTable">
-            <Form.Control as="select" onChange={handleTableChanged}>
-              <option id="selector" value="Selector">
-                Select Table
-              </option>
+          <Form.Group className="wizard-form">
+            <Select showSearch placeholder="Select target table" onChange={handleTableChanged} style={{ width: 300 }}>
               {destTables.map((table, key) => {
                 return (
-                  <option id={table} key={key}>
+                  <Option value={table} type="destinationTable" key={key}>
                     {table}
-                  </option>
+                  </Option>
                 );
               })}
-            </Form.Control>
+            </Select>
           </Form.Group>
         )}
       </Form>

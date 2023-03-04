@@ -14,7 +14,7 @@ function renderSingleColumnTable(table, header, identifier, modifier) {
     <Table striped bordered hover size="sm" responsive>
       <thead>
         <tr>
-          <th>{header}</th>
+          <th key={"singleColumnHead"}>{header}</th>
         </tr>
       </thead>
       <tbody>
@@ -45,8 +45,8 @@ function renderTable(table, modifier) {
     <Table striped bordered hover size="sm" responsive>
       <thead>
         <tr key={"head"}>
-          {Object.values(tableStructure).map((value) => {
-            return <th>{value}</th>;
+          {Object.values(tableStructure).map((value, key) => {
+            return <th key={key}>{value}</th>;
           })}
         </tr>
       </thead>
