@@ -54,3 +54,7 @@ html, body, #app, #root {
   background-color: white;
   color: #2f3238;
 }
+
+textarea {
+  resize: none;
+}

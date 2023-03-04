@@ -338,9 +338,11 @@ export default function ConnectionForm() {
 
   const handleCompare = async () => {
     dispatch(triggerIsLoading(true));
+    const sqlArea = document.getElementById("SQLResults");
     let possibleTabs = [];
     let exclude = [];
     let url = "";
+    let sqlString = [];
     let compare_mode = "quick";
     let compare_item = "schemas";
     if (detailedCompare) {
@@ -379,14 +381,23 @@ export default function ConnectionForm() {
       if (detailedCompare) {
         if (enableTableCompare) {
           dispatch(updateDetailedTable(response.data.result));
+          sqlArea.value = response.data.result.Columns.scripts.replaceAll(";", ";\n");
         } else {
           dispatch(updateDetailedSchema(response.data.result));
+          for (let table in response.data.result["tables-to-be-altered"]) {
+            let tableKey = Object.keys(response.data.result["tables-to-be-altered"][table]);
+            let tableScripts = response.data.result["tables-to-be-altered"][table][tableKey].Columns.scripts;
+            sqlString.push(tableScripts);
+          }
+          sqlArea.value = sqlString.join("").replaceAll(";", ";\n");
         }
       } else {
         if (enableTableCompare) {
           dispatch(updateQuickTable(response.data.result));
+          sqlArea.value = response.data.result.Columns.scripts.replaceAll(";", ";\n");
         } else {
           dispatch(updateQuickSchema(response.data.result));
+          sqlArea.value = "";
         }
       }
       dispatch(

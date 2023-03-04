@@ -3,8 +3,10 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Table from "react-bootstrap/Table";
 import Accordion from "react-bootstrap/Accordion";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 import { useSelector, useDispatch } from "react-redux";
-import { setActiveTab } from "../actions";
+import { setActiveTab, triggerToast } from "../actions";
 import { tableStructure } from "../utils";
 
 function renderSingleColumnTable(table, header, identifier, modifier) {
@@ -156,6 +158,21 @@ export default function ComparisonArea() {
   const activeTab = useSelector((state) => state.app.activeResultTab);
   const dispatch = useDispatch();
   const tableView = detailedTableView(detailedTable);
+
+  const handleCopy = () => {
+    const sqlContainer = document.getElementById("SQLResults");
+    sqlContainer.select();
+    sqlContainer.setSelectionRange(0, 10);
+    navigator.clipboard.writeText(sqlContainer.value);
+    dispatch(
+      triggerToast({
+        title: "Success",
+        message: "Contents were copied to clipboard",
+        visible: true,
+      })
+    );
+  };
+
   return (
     <Tabs id="comparisonTabs" activeKey={activeTab} onSelect={(k) => dispatch(setActiveTab(k))} justify className="mt-3">
       <Tab eventKey={0} title="Table Quick">
@@ -230,7 +247,18 @@ export default function ComparisonArea() {
           </Accordion.Item>
         </Accordion>
       </Tab>
-      <Tab eventKey={4} title="Generated SQLs"></Tab>
+      <Tab eventKey={4} title="Generated SQLs">
+        <Form>
+          <Form.Group className="mb-3" controlId="SQLResults">
+            <Form.Control as="textarea" rows={19} disabled />
+          </Form.Group>
+        </Form>
+        <div className="d-grid gap-2">
+          <Button variant="outline-success" size="lg" onClick={handleCopy}>
+            Copy to clipboard
+          </Button>
+        </div>
+      </Tab>
     </Tabs>
   );
 }
