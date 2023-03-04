@@ -5,6 +5,65 @@ import Table from "react-bootstrap/Table";
 import Accordion from "react-bootstrap/Accordion";
 import { useSelector, useDispatch } from "react-redux";
 import { setActiveTab } from "../actions";
+import { tableStructure } from "../utils";
+
+function renderSingleColumnTable(table, header, identifier, modifier) {
+  return (
+    <Table striped bordered hover size="sm" responsive>
+      <thead>
+        <tr>
+          <th>{header}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {identifier
+          ? table[identifier] &&
+            table[identifier][modifier].map((item, key) => {
+              return (
+                <tr key={key}>
+                  <td>{item}</td>
+                </tr>
+              );
+            })
+          : table[modifier] &&
+            table[modifier].map((item, key) => {
+              return (
+                <tr key={key}>
+                  <td>{item}</td>
+                </tr>
+              );
+            })}
+      </tbody>
+    </Table>
+  );
+}
+
+function renderTable(table, modifier) {
+  return (
+    <Table striped bordered hover size="sm" responsive>
+      <thead>
+        <tr key={"head"}>
+          {Object.values(tableStructure).map((value) => {
+            return <th>{value}</th>;
+          })}
+        </tr>
+      </thead>
+      <tbody>
+        {table.Columns &&
+          table.Columns[modifier].map((column, key) => {
+            return (
+              <tr key={key}>
+                <td>{column.column_name}</td>
+                <td>{column.type}</td>
+                <td>{column.is_nullable}</td>
+                <td>{column.maximum_length}</td>
+              </tr>
+            );
+          })}
+      </tbody>
+    </Table>
+  );
+}
 
 function detailedTableView(table) {
   return (
@@ -15,87 +74,15 @@ function detailedTableView(table) {
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>To be altered - Modifications count: {table.Columns ? table.Columns["columns-to-be-altered"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>Column name</th>
-                      <th>Type</th>
-                      <th>Is nullable?</th>
-                      <th>Maximum length</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.Columns &&
-                      table.Columns["columns-to-be-altered"].map((column, key) => {
-                        return (
-                          <tr>
-                            <td>{column.column_name}</td>
-                            <td>{column.type}</td>
-                            <td>{column.is_nullable}</td>
-                            <td>{column.maximum_length}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderTable(table, "columns-to-be-altered")}</Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="1">
               <Accordion.Header>To be deleted - Modifications count: {table.Columns ? table.Columns["columns-to-be-removed"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>Column name</th>
-                      <th>Type</th>
-                      <th>Is nullable?</th>
-                      <th>Maximum length</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.Columns &&
-                      table.Columns["columns-to-be-removed"].map((column, key) => {
-                        return (
-                          <tr>
-                            <td>{column.column_name}</td>
-                            <td>{column.type}</td>
-                            <td>{column.is_nullable}</td>
-                            <td>{column.maximum_length}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderTable(table, "columns-to-be-removed")}</Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="2">
               <Accordion.Header>To be created - Modifications count: {table.Columns ? table.Columns["columns-to-be-created"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>Column name</th>
-                      <th>Type</th>
-                      <th>Is nullable?</th>
-                      <th>Maximum length</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.Columns &&
-                      table.Columns["columns-to-be-created"].map((column, key) => {
-                        return (
-                          <tr>
-                            <td>{column.column_name}</td>
-                            <td>{column.type}</td>
-                            <td>{column.is_nullable}</td>
-                            <td>{column.maximum_length}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderTable(table, "columns-to-be-created")}</Accordion.Body>
             </Accordion.Item>
           </Accordion>
         </Accordion.Body>
@@ -106,69 +93,15 @@ function detailedTableView(table) {
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>To be altered - Modifications count: {table.PKs ? table.PKs["pks-to-be-altered"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>PK name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.PKs &&
-                      table.PKs["pks-to-be-altered"].map((pk, key) => {
-                        return (
-                          <tr>
-                            <td>{pk}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "PK name", "PKs", "pks-to-be-altered")}</Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="1">
               <Accordion.Header>To be deleted - Modifications count: {table.PKs ? table.PKs["pks-to-be-removed"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>PK name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.PKs &&
-                      table.PKs["pks-to-be-removed"].map((pk, key) => {
-                        return (
-                          <tr>
-                            <td>{pk}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "PK name", "PKs", "pks-to-be-removed")}</Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="2">
               <Accordion.Header>To be created - Modifications count: {table.PKs ? table.PKs["pks-to-be-created"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>PK name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.PKs &&
-                      table.PKs["pks-to-be-created"].map((pk, key) => {
-                        return (
-                          <tr>
-                            <td>{pk}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "PK name", "PKs", "pks-to-be-created")}</Accordion.Body>
             </Accordion.Item>
           </Accordion>
         </Accordion.Body>
@@ -179,69 +112,15 @@ function detailedTableView(table) {
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>To be altered - Modifications count: {table.FKs ? table.FKs["fks-to-be-altered"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>FK name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.FKs &&
-                      table.FKs["fks-to-be-altered"].map((fk, key) => {
-                        return (
-                          <tr>
-                            <td>{fk}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "FK name", "FKs", "fks-to-be-altered")}</Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="1">
               <Accordion.Header>To be deleted - Modifications count: {table.FKs ? table.FKs["fks-to-be-removed"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>FK name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.FKs &&
-                      table.FKs["fks-to-be-removed"].map((fk, key) => {
-                        return (
-                          <tr>
-                            <td>{fk}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "FK name", "FKs", "fks-to-be-removed")}</Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="2">
               <Accordion.Header>To be created - Modifications count: {table.FKs ? table.FKs["fks-to-be-created"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>FK name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.FKs &&
-                      table.FKs["fks-to-be-created"].map((fk, key) => {
-                        return (
-                          <tr>
-                            <td>{fk}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "FK name", "FKs", "fks-to-be-created")}</Accordion.Body>
             </Accordion.Item>
           </Accordion>
         </Accordion.Body>
@@ -252,69 +131,15 @@ function detailedTableView(table) {
           <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>To be altered - Modifications count: {table.IDXs ? table.IDXs["idx-to-be-altered"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>Index name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.IDXs &&
-                      table.IDXs["idx-to-be-altered"].map((idx, key) => {
-                        return (
-                          <tr>
-                            <td>{idx}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "Index name", "IDXs", "idx-to-be-altered")}</Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="1">
               <Accordion.Header>To be deleted - Modifications count: {table.IDXs ? table.IDXs["idx-to-be-removed"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>Index name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.IDXs &&
-                      table.IDXs["idx-to-be-removed"].map((idx, key) => {
-                        return (
-                          <tr>
-                            <td>{idx}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "Index name", "IDXs", "idx-to-be-removed")}</Accordion.Body>
             </Accordion.Item>
             <Accordion.Item eventKey="2">
               <Accordion.Header>To be created - Modifications count: {table.IDXs ? table.IDXs["idx-to-be-created"].length : 0}</Accordion.Header>
-              <Accordion.Body>
-                <Table striped bordered hover size="sm" responsive>
-                  <thead>
-                    <tr>
-                      <th>Index name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.IDXs &&
-                      table.IDXs["idx-to-be-created"].map((idx, key) => {
-                        return (
-                          <tr>
-                            <td>{idx}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              </Accordion.Body>
+              <Accordion.Body>{renderSingleColumnTable(table, "Index name", "IDXs", "idx-to-be-created")}</Accordion.Body>
             </Accordion.Item>
           </Accordion>
         </Accordion.Body>
@@ -337,93 +162,15 @@ export default function ComparisonArea() {
         <Accordion>
           <Accordion.Item eventKey="1">
             <Accordion.Header>Columns to be altered - Modifications count: {quickTable.Columns ? quickTable.Columns["columns-to-be-altered"].length : 0}</Accordion.Header>
-            <Accordion.Body>
-              <Table striped bordered hover size="sm" responsive>
-                <thead>
-                  <tr>
-                    <th>Column name</th>
-                    <th>Type</th>
-                    <th>Is nullable?</th>
-                    <th>Maximum length</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quickTable.Columns &&
-                    quickTable.Columns["columns-to-be-altered"].map((column, key) => {
-                      return (
-                        <tr>
-                          <td>{column.column_name}</td>
-                          <td>{column.type}</td>
-                          <td>{column.is_nullable}</td>
-                          <td>{column.maximum_length}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </Table>
-            </Accordion.Body>
+            <Accordion.Body>{renderTable(quickTable, "columns-to-be-altered")}</Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="2">
             <Accordion.Header>Columns to be created - Modifications count: {quickTable.Columns ? quickTable.Columns["columns-to-be-created"].length : 0}</Accordion.Header>
-            <Accordion.Body>
-              <Table striped bordered hover size="sm" responsive>
-                <thead>
-                  <tr>
-                    <th>Column name</th>
-                    <th>Type</th>
-                    <th>Is nullable?</th>
-                    <th>Maximum length</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quickTable.Columns &&
-                    quickTable.Columns["columns-to-be-created"].map((column, key) => {
-                      return (
-                        <tr>
-                          <td>{column.column_name}</td>
-                          <td>{column.type}</td>
-                          <td>{column.is_nullable}</td>
-                          <td>{column.maximum_length}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </Table>
-            </Accordion.Body>
+            <Accordion.Body>{renderTable(quickTable, "columns-to-be-created")}</Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="3">
-            <Accordion.Header
-              style={{
-                backgroundColor: "#198754",
-              }}
-            >
-              Columns to be deleted - Modifications count: {quickTable.Columns ? quickTable.Columns["columns-to-be-removed"].length : 0}
-            </Accordion.Header>
-            <Accordion.Body>
-              <Table striped bordered hover size="sm" responsive>
-                <thead>
-                  <tr>
-                    <th>Column name</th>
-                    <th>Type</th>
-                    <th>Is nullable?</th>
-                    <th>Maximum length</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quickTable.Columns &&
-                    quickTable.Columns["columns-to-be-removed"].map((column, key) => {
-                      return (
-                        <tr>
-                          <td>{column.column_name}</td>
-                          <td>{column.type}</td>
-                          <td>{column.is_nullable}</td>
-                          <td>{column.maximum_length}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </Table>
-            </Accordion.Body>
+            <Accordion.Header>Columns to be deleted - Modifications count: {quickTable.Columns ? quickTable.Columns["columns-to-be-removed"].length : 0}</Accordion.Header>
+            <Accordion.Body>{renderTable(quickTable, "columns-to-be-removed")}</Accordion.Body>
           </Accordion.Item>
         </Accordion>
       </Tab>
@@ -434,47 +181,11 @@ export default function ComparisonArea() {
         <Accordion>
           <Accordion.Item eventKey="0">
             <Accordion.Header>Tables to be created - Modifications count: {quickSchema["tables-to-be-created"] ? quickSchema["tables-to-be-created"].length : 0}</Accordion.Header>
-            <Accordion.Body>
-              <Table striped bordered hover size="sm">
-                <thead>
-                  <tr>
-                    <th>Table name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quickSchema["tables-to-be-created"] &&
-                    quickSchema["tables-to-be-created"].map((table, key) => {
-                      return (
-                        <tr>
-                          <td>{table}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </Table>
-            </Accordion.Body>
+            <Accordion.Body>{renderSingleColumnTable(quickSchema, "Table name", undefined, "tables-to-be-created")}</Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="1">
             <Accordion.Header>Tables to be removed - Modifications count: {quickSchema["tables-to-be-removed"] ? quickSchema["tables-to-be-removed"].length : 0}</Accordion.Header>
-            <Accordion.Body>
-              <Table striped bordered hover size="sm">
-                <thead>
-                  <tr>
-                    <th>Table name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quickSchema["tables-to-be-removed"] &&
-                    quickSchema["tables-to-be-removed"].map((table, key) => {
-                      return (
-                        <tr>
-                          <td>{table}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </Table>
-            </Accordion.Body>
+            <Accordion.Body>{renderSingleColumnTable(quickSchema, "Table name", undefined, "tables-to-be-removed")}</Accordion.Body>
           </Accordion.Item>
         </Accordion>
       </Tab>
@@ -482,47 +193,11 @@ export default function ComparisonArea() {
         <Accordion>
           <Accordion.Item eventKey="0">
             <Accordion.Header>Tables to be created - Modifications count: {detailedSchema ? detailedSchema["tables-to-be-created"].length : 0}</Accordion.Header>
-            <Accordion.Body>
-              <Table striped bordered hover size="sm">
-                <thead>
-                  <tr>
-                    <th>Table name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detailedSchema["tables-to-be-created"] &&
-                    detailedSchema["tables-to-be-created"].map((table, key) => {
-                      return (
-                        <tr>
-                          <td>{table}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </Table>
-            </Accordion.Body>
+            <Accordion.Body>{renderSingleColumnTable(detailedSchema, "Table name", undefined, "tables-to-be-created")}</Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="1">
             <Accordion.Header>Tables to be removed - Modifications count: {detailedSchema ? detailedSchema["tables-to-be-removed"].length : 0}</Accordion.Header>
-            <Accordion.Body>
-              <Table striped bordered hover size="sm">
-                <thead>
-                  <tr>
-                    <th>Table name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detailedSchema["tables-to-be-removed"] &&
-                    detailedSchema["tables-to-be-removed"].map((table, key) => {
-                      return (
-                        <tr>
-                          <td>{table}</td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </Table>
-            </Accordion.Body>
+            <Accordion.Body>{renderSingleColumnTable(detailedSchema, "Table name", undefined, "tables-to-be-removed")}</Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="2">
             <Accordion.Header>Tables to be altered - Modifications count: {detailedSchema ? detailedSchema["tables-to-be-altered"].length : 0}</Accordion.Header>

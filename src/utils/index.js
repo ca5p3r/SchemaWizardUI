@@ -59,3 +59,10 @@ export const requester = async (connection_object, url, enable_compare = false) 
   const response = axios(config);
   return response;
 };
+
+export const tableStructure = {
+  column_name: "Column name",
+  type: "Type",
+  is_nullable: "Is nullable",
+  maximum_length: "Maximum length",
+};
