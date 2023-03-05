@@ -2,7 +2,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { triggerKeyAuth, triggerSSHTunnel, triggerTableCompare, triggerToast, addServer, triggerIsLoading, updateDetailedSchema, updateDetailedTable, updateQuickSchema, updateQuickTable, setActiveTab } from "../actions";
+import { triggerKeyAuth, triggerSSHTunnel, triggerTableCompare, triggerToast, addServer, triggerIsLoading, updateDetailedSchema, updateDetailedTable, updateQuickSchema, updateQuickTable, setActiveTab, updateDetailedChangesCount } from "../actions";
 import { constants, requester } from "../utils";
 import { Select } from "antd";
 
@@ -313,6 +313,7 @@ export default function ConnectionForm() {
     let sqlString = [];
     let compare_mode = "quick";
     let compare_item = "schemas";
+    let totalDetailedChanges = 0;
     if (detailedCompare) {
       compare_mode = "detailed";
       possibleTabs = [1, 3];
@@ -354,9 +355,24 @@ export default function ConnectionForm() {
           dispatch(updateDetailedSchema(response.data.result));
           for (let table in response.data.result["tables-to-be-altered"]) {
             let tableKey = Object.keys(response.data.result["tables-to-be-altered"][table]);
+            const items_count =
+              response.data.result["tables-to-be-altered"][table][tableKey].Columns["columns-to-be-altered"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].Columns["columns-to-be-created"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].Columns["columns-to-be-removed"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].PKs["pks-to-be-altered"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].PKs["pks-to-be-created"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].PKs["pks-to-be-removed"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].FKs["fks-to-be-altered"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].FKs["fks-to-be-created"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].FKs["fks-to-be-removed"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].IDXs["idx-to-be-altered"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].IDXs["idx-to-be-created"].length +
+              response.data.result["tables-to-be-altered"][table][tableKey].IDXs["idx-to-be-removed"].length;
+            totalDetailedChanges = totalDetailedChanges + items_count;
             let tableScripts = response.data.result["tables-to-be-altered"][table][tableKey].Columns.scripts;
             sqlString.push(tableScripts ? tableScripts : "");
           }
+          dispatch(updateDetailedChangesCount(totalDetailedChanges));
           sqlArea.value = sqlString.join("").replaceAll(";", ";\n");
         }
       } else {
