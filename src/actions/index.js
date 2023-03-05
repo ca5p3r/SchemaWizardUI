@@ -71,3 +71,9 @@ export const setActiveTab = (x = "0") => {
     payload: x,
   };
 };
+export const updateDetailedChangesCount = (x = 0) => {
+  return {
+    type: "updateDetailedChangesCount",
+    payload: x,
+  };
+};

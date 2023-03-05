@@ -3,6 +3,7 @@ const myState = {
   quickSchemaResults: {},
   detailedTableResults: {},
   detailedSchemaResults: false,
+  detailedChangesCount: 0,
 };
 
 export const resultsReducer = (state = myState, action = {}) => {
@@ -26,6 +27,11 @@ export const resultsReducer = (state = myState, action = {}) => {
       return {
         ...state,
         detailedSchemaResults: action.payload,
+      };
+    case "updateDetailedChangesCount":
+      return {
+        ...state,
+        detailedChangesCount: action.payload,
       };
     default:
       return state;

@@ -117,6 +117,13 @@ export default function ConnectionForm() {
     portField.value = "";
     userField.value = "";
     passwordField.value = "";
+    setServerReady();
+    setServerObject({
+      host: "",
+      port: "",
+      username: "",
+      password: "",
+    });
     if (enableSSH) {
       sshHostFiled.value = "";
       sshPortField.value = "";
@@ -125,6 +132,13 @@ export default function ConnectionForm() {
       handleSSHToggle();
       handleKeyToggle();
     }
+    dispatch(
+      triggerToast({
+        title: "Success",
+        message: "Connection fields have been reset",
+        visible: true,
+      })
+    );
   };
 
   const handleServerCheck = async () => {
